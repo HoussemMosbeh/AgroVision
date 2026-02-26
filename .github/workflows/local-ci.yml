@@ -36,7 +36,7 @@ jobs:
 
       - name: Build & Test Backend
         run: |
-          cd backend
+          cd BackEnd
           mvn clean package
           mvn test
 
@@ -48,20 +48,20 @@ jobs:
 
       - name: Build Frontend
         run: |
-          cd frontend
+          cd FrontEnd
           npm install
           npm run build
 
       # AI modules
       - name: Test CNN
         run: |
-          cd ai/cnn
+          cd AI/cnn
           pip install -r requirements.txt
           python -m unittest discover
 
       - name: Test XGBoost
         run: |
-          cd ai/xgboost
+          cd AI/xgboost
           pip install -r requirements.txt
           python -m unittest discover
 
