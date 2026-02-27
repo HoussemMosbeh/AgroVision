@@ -37,7 +37,7 @@ jobs:
       - name: Build & Test Backend
         run: |
           cd BackEnd/AgroVision
-          mvn clean package
+          mvn clean package -e
           mvn test
 
       # Frontend
