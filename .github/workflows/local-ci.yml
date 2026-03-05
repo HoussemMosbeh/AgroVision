@@ -1,21 +1,19 @@
 name: Local CI/CD
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: agrovision
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
@@ -23,53 +21,56 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-
     steps:
       - uses: actions/checkout@v3
-
-      # Backend
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: temurin
-
       - name: Build & Test Backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
           mvn test
-
-      # Frontend
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Build Frontend
         run: |
           cd FrontEnd
           npm install
           npm run build
-
-      # AI modules
       - name: Test CNN
         run: |
           cd AI/cnn
           pip install -r requirements.txt
           python -m unittest discover
-
       - name: Test XGBoost
         run: |
           cd AI/xgboost
           pip install -r requirements.txt
           python -m unittest discover
-
   docker-compose-up:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-and-test
     steps:
       - uses: actions/checkout@v3
+      - name: Create .env file
+        run: |
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" >> .env
+          echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
+          echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
+          echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
       - name: Build & Start Containers
         run: |
-          docker-compose up -d --build
+          docker compose down
+          docker compose up -d --build
