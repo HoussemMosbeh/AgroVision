@@ -1,10 +1,12 @@
 package com.example.demo.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 
 @Entity
-@Table(name = "users")
+@Table(name = "utilisateurs")
 public class userModel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +21,11 @@ public class userModel {
 	@Column(nullable = false)
 	private String email;
 
-	@Column(nullable = false)
+	@Column(name = "mot_de_passe" ,nullable = false)
 	private String password;
+
+	@Column(name = "date_creation", insertable = false, updatable = false)
+	private LocalDateTime dateCreation;
 
 	// no-arg constructor required by JPA
 	public userModel() {}
