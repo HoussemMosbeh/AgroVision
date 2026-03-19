@@ -1,7 +1,7 @@
 package com.example.demo.model;
 
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 
@@ -21,6 +21,7 @@ public class userModel {
 	@Column(nullable = false)
 	private String email;
 
+	@JsonIgnore
 	@Column(name = "mot_de_passe" ,nullable = false)
 	private String password;
 

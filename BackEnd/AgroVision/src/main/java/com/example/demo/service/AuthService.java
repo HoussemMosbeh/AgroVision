@@ -1,4 +1,5 @@
-package com.example.demo.auth;
+package com.example.demo.service;
+import com.example.demo.dto.*;
 
 import com.example.demo.model.userModel;
 import com.example.demo.repository.userRepository;
