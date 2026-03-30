@@ -34,4 +34,16 @@ public class JwtUtil {
                 .getSubject();
     }
 
+    public boolean isTokenValid(String token) {
+            try {
+        Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token);
+        return true;
+    } catch (JwtException | IllegalArgumentException e) {
+        return false;
+    }
+    }
+
 }
