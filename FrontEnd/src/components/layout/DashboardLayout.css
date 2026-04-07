@@ -1,0 +1,5 @@
+/* DashboardLayout.css */
+.layout { display: flex; min-height: 100vh; }
+.layout__main { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; }
+.layout__content { flex: 1; padding: var(--space-lg); }
+@media (max-width: 768px) { .layout__main { margin-left: 0; } }
