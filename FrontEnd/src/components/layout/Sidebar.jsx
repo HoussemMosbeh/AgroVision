@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { MdDashboard, MdGrass, MdBiotech } from 'react-icons/md'
+import { MdHome, MdTerrain, MdGrass, MdBiotech } from 'react-icons/md'
 import './Sidebar.css'
 
 const navItems = [
-  { to: '/',        icon: <MdDashboard />, label: 'Dashboard'      },
-  { to: '/yield',   icon: <MdGrass />,     label: 'Yield Predict'  },
-  { to: '/disease', icon: <MdBiotech />,   label: 'Disease Detect' },
+  { to: '/',        icon: <MdHome />,    label: 'Accueil'         },
+  { to: '/terrain', icon: <MdTerrain />, label: 'Mes Terrains'    },
+  { to: '/yield',   icon: <MdGrass />,   label: 'Prédiction'      },
+  { to: '/disease', icon: <MdBiotech />, label: 'Détection'       },
 ]
 
 function Sidebar() {
