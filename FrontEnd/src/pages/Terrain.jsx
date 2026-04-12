@@ -1,61 +1,44 @@
 import { useState, useEffect } from 'react'
 import axiosInstance from '../api/axiosInstance'
+import fieldService from '../api/fieldService'
 import './Terrain.css'
 
 function Terrain() {
-  const [fields, setFields]     = useState([])
-  const [plantes, setPlantes]   = useState([])
-  const [loading, setLoading]   = useState(false)
-  const [success, setSuccess]   = useState('')
-  const [error, setError]       = useState('')
+  const [fields, setFields]   = useState([])
+  const [plantes, setPlantes] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState('')
+  const [error, setError]     = useState('')
   const [activeTab, setActiveTab] = useState('list')
 
-  // Form states — mapped exactly to fieldRequestDTO
   const [fieldForm, setFieldForm] = useState({
     nom: '', superficie: '', pays: '', region: '', latitude: '', longitude: '',
   })
-
-  // Soil form — mapped exactly to soilRequestDTO.Request
   const [soilForm, setSoilForm] = useState({
     ph: '', azote: '', phosphore: '', potassium: '',
     humidite: '', matiere_organique: '', temperature: '',
   })
 
-  const [selectedFieldId, setSelectedFieldId] = useState(null)
+  const [selectedFieldId, setSelectedFieldId]   = useState(null)
   const [selectedPlanteId, setSelectedPlanteId] = useState('')
-  const [datePlantation, setDatePlantation] = useState('')
+  const [datePlantation, setDatePlantation]     = useState('')
 
-  // Load fields and plantes on mount
-  useEffect(() => {
-    fetchFields()
-    fetchPlantes()
-  }, [])
+  useEffect(() => { fetchFields(); fetchPlantes() }, [])
 
   const fetchFields = async () => {
-    try {
-      const res = await axiosInstance.get('/fields')
-      setFields(res.data)
-    } catch (err) {
-      console.error('Erreur chargement terrains', err)
-    }
+    try { setFields(await fieldService.getAllFields()) }
+    catch { setError('Impossible de charger les terrains.') }
   }
-
   const fetchPlantes = async () => {
-    try {
-      const res = await axiosInstance.get('/plantes')
-      setPlantes(res.data)
-    } catch (err) {
-      console.error('Erreur chargement plantes', err)
-    }
+    try { setPlantes(await fieldService.getAllPlantes()) }
+    catch {}
   }
 
-  const handleFieldSubmit = async (e) => {
+  const handleFieldAndSoilSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
-    setError('')
-    setSuccess('')
+    setLoading(true); setError(''); setSuccess('')
     try {
-      await axiosInstance.post('/fields', {
+      const created = await fieldService.createField({
         nom: fieldForm.nom,
         superficie: parseFloat(fieldForm.superficie),
         pays: fieldForm.pays,
@@ -63,37 +46,26 @@ function Terrain() {
         latitude: parseFloat(fieldForm.latitude),
         longitude: parseFloat(fieldForm.longitude),
       })
+      const newId = created.id
+      const hasSoil = Object.values(soilForm).some(v => v !== '')
+      if (hasSoil) {
+        await fieldService.addSoilMetrics(newId, {
+          ph: parseFloat(soilForm.ph),
+          azote: parseFloat(soilForm.azote),
+          phosphore: parseFloat(soilForm.phosphore),
+          potassium: parseFloat(soilForm.potassium),
+          humidite: parseFloat(soilForm.humidite),
+          matiere_organique: parseFloat(soilForm.matiere_organique),
+          temperature: parseFloat(soilForm.temperature),
+        })
+      }
       setSuccess('Terrain créé avec succès !')
       setFieldForm({ nom: '', superficie: '', pays: '', region: '', latitude: '', longitude: '' })
+      setSoilForm({ ph: '', azote: '', phosphore: '', potassium: '', humidite: '', matiere_organique: '', temperature: '' })
       fetchFields()
       setActiveTab('list')
-    } catch (err) {
-      setError('Erreur lors de la création du terrain.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSoilSubmit = async (e) => {
-    e.preventDefault()
-    if (!selectedFieldId) return setError('Sélectionnez un terrain d\'abord.')
-    setLoading(true)
-    setError('')
-    setSuccess('')
-    try {
-      await axiosInstance.post(`/fields/${selectedFieldId}/soils`, {
-        ph: parseFloat(soilForm.ph),
-        azote: parseFloat(soilForm.azote),
-        phosphore: parseFloat(soilForm.phosphore),
-        potassium: parseFloat(soilForm.potassium),
-        humidite: parseFloat(soilForm.humidite),
-        matiere_organique: parseFloat(soilForm.matiere_organique),
-        temperature: parseFloat(soilForm.temperature),
-      })
-      setSuccess('Métriques sol ajoutées avec succès !')
-      setSoilForm({ ph: '', azote: '', phosphore: '', potassium: '', humidite: '', matiere_organique: '', temperature: '' })
-    } catch (err) {
-      setError('Erreur lors de l\'ajout des métriques sol.')
+    } catch {
+      setError('Erreur lors de la création.')
     } finally {
       setLoading(false)
     }
@@ -102,18 +74,13 @@ function Terrain() {
   const handlePlanteSubmit = async (e) => {
     e.preventDefault()
     if (!selectedFieldId) return setError('Sélectionnez un terrain d\'abord.')
-    setLoading(true)
-    setError('')
-    setSuccess('')
+    setLoading(true); setError(''); setSuccess('')
     try {
-      await axiosInstance.post(
-        `/fields/${selectedFieldId}/plantes?planteId=${selectedPlanteId}&datePlantation=${datePlantation}`
-      )
+      await fieldService.associatePlante(selectedFieldId, selectedPlanteId, datePlantation)
       setSuccess('Culture associée avec succès !')
-      setSelectedPlanteId('')
-      setDatePlantation('')
-    } catch (err) {
-      setError('Erreur lors de l\'association de la culture.')
+      setSelectedPlanteId(''); setDatePlantation('')
+    } catch {
+      setError('Erreur lors de l\'association.')
     } finally {
       setLoading(false)
     }
@@ -122,73 +89,78 @@ function Terrain() {
   const handleDelete = async (fieldId) => {
     if (!window.confirm('Supprimer ce terrain ?')) return
     try {
-      await axiosInstance.delete(`/fields/${fieldId}`)
+      await fieldService.deleteField(fieldId)
+      setSelectedFieldId(prev => prev === fieldId ? null : prev)
       setSuccess('Terrain supprimé.')
       fetchFields()
-    } catch (err) {
+    } catch {
       setError('Erreur lors de la suppression.')
     }
   }
 
+  const tabs = [
+    { key: 'list',   label: 'Mes Terrains',    icon: '▤' },
+    { key: 'create', label: 'Nouveau Terrain',  icon: '+' },
+    { key: 'plante', label: 'Associer Culture', icon: '❧' },
+  ]
+
   return (
-    <div className="terrain">
-      <div className="terrain__header">
-        <h1 className="terrain__title">🌍 Mes Terrains</h1>
-        <p className="terrain__subtitle">Gérez vos parcelles agricoles, sols et cultures</p>
+    <div className="t-page">
+      <div className="t-hero">
+        <div className="t-hero__accent" />
+        <h1 className="t-hero__title">Gestion des Terrains</h1>
+        <p className="t-hero__sub">Parcelles · Sols · Cultures</p>
       </div>
 
-      {/* TABS */}
-      <div className="terrain__tabs">
-        {['list', 'create', 'soil', 'plante'].map(tab => (
+      <div className="t-tabs">
+        {tabs.map(tab => (
           <button
-            key={tab}
-            className={`terrain__tab ${activeTab === tab ? 'terrain__tab--active' : ''}`}
-            onClick={() => { setActiveTab(tab); setError(''); setSuccess(''); }}
+            key={tab.key}
+            className={`t-tab ${activeTab === tab.key ? 't-tab--active' : ''}`}
+            onClick={() => { setActiveTab(tab.key); setError(''); setSuccess('') }}
           >
-            {tab === 'list'   && '📋 Mes terrains'}
-            {tab === 'create' && '➕ Nouveau terrain'}
-            {tab === 'soil'   && '🧪 Métriques sol'}
-            {tab === 'plante' && '🌱 Associer culture'}
+            <span className="t-tab__icon">{tab.icon}</span>
+            {tab.label}
           </button>
         ))}
       </div>
 
-      {/* ALERTS */}
-      {success && <div className="alert alert--success">{success}</div>}
-      {error   && <div className="alert alert--error">{error}</div>}
+      {success && <div className="t-alert t-alert--ok">{success}</div>}
+      {error   && <div className="t-alert t-alert--err">{error}</div>}
 
-      {/* TAB: LIST */}
+      {/* LIST TAB */}
       {activeTab === 'list' && (
-        <div className="terrain__list">
+        <div className="t-section">
           {fields.length === 0 ? (
-            <div className="terrain__empty">
+            <div className="t-empty">
+              <span className="t-empty__icon">🌾</span>
               <p>Aucun terrain enregistré.</p>
-              <button className="btn btn--primary" onClick={() => setActiveTab('create')}>
+              <button className="t-btn t-btn--primary" onClick={() => setActiveTab('create')}>
                 Créer mon premier terrain
               </button>
             </div>
           ) : (
-            <div className="field-grid">
+            <div className="t-grid">
               {fields.map(field => (
                 <div
                   key={field.id}
-                  className={`field-card ${selectedFieldId === field.id ? 'field-card--selected' : ''}`}
+                  className={`t-card ${selectedFieldId === field.id ? 't-card--active' : ''}`}
                   onClick={() => setSelectedFieldId(field.id)}
                 >
-                  <div className="field-card__header">
-                    <span className="field-card__name">{field.nom}</span>
+                  <div className="t-card__top">
+                    <span className="t-card__name">{field.nom}</span>
                     <button
-                      className="field-card__delete"
-                      onClick={(e) => { e.stopPropagation(); handleDelete(field.id) }}
+                      className="t-card__del"
+                      onClick={e => { e.stopPropagation(); handleDelete(field.id) }}
                     >✕</button>
                   </div>
-                  <div className="field-card__info">
+                  <div className="t-card__meta">
                     <span>📍 {field.region}, {field.pays}</span>
                     <span>📐 {field.superficie} ha</span>
                     <span>🌐 {field.latitude}, {field.longitude}</span>
                   </div>
                   {selectedFieldId === field.id && (
-                    <div className="field-card__selected-badge">✓ Sélectionné</div>
+                    <div className="t-card__badge">Sélectionné</div>
                   )}
                 </div>
               ))}
@@ -197,135 +169,132 @@ function Terrain() {
         </div>
       )}
 
-      {/* TAB: CREATE FIELD */}
+      {/* CREATE + SOIL TAB */}
       {activeTab === 'create' && (
-        <form className="terrain__form" onSubmit={handleFieldSubmit}>
-          <div className="form-grid">
-            <div className="form-field">
-              <label>Nom du terrain</label>
-              <input type="text" placeholder="Ex: Parcelle Nord"
-                value={fieldForm.nom}
-                onChange={e => setFieldForm({...fieldForm, nom: e.target.value})}
-                required />
+        <form className="t-section" onSubmit={handleFieldAndSoilSubmit}>
+          <div className="t-block">
+            <div className="t-block__header">
+              <span className="t-block__num">01</span>
+              <div>
+                <h2 className="t-block__title">Informations du terrain</h2>
+                <p className="t-block__desc">Localisation et superficie de la parcelle</p>
+              </div>
             </div>
-            <div className="form-field">
-              <label>Superficie (hectares)</label>
-              <input type="number" step="0.01" placeholder="Ex: 5.5"
-                value={fieldForm.superficie}
-                onChange={e => setFieldForm({...fieldForm, superficie: e.target.value})}
-                required />
-            </div>
-            <div className="form-field">
-              <label>Pays</label>
-              <input type="text" placeholder="Ex: Tunisie"
-                value={fieldForm.pays}
-                onChange={e => setFieldForm({...fieldForm, pays: e.target.value})}
-                required />
-            </div>
-            <div className="form-field">
-              <label>Région</label>
-              <input type="text" placeholder="Ex: Sfax"
-                value={fieldForm.region}
-                onChange={e => setFieldForm({...fieldForm, region: e.target.value})}
-                required />
-            </div>
-            <div className="form-field">
-              <label>Latitude</label>
-              <input type="number" step="0.000001" placeholder="Ex: 34.7406"
-                value={fieldForm.latitude}
-                onChange={e => setFieldForm({...fieldForm, latitude: e.target.value})}
-                required />
-            </div>
-            <div className="form-field">
-              <label>Longitude</label>
-              <input type="number" step="0.000001" placeholder="Ex: 10.7603"
-                value={fieldForm.longitude}
-                onChange={e => setFieldForm({...fieldForm, longitude: e.target.value})}
-                required />
-            </div>
-          </div>
-          <button type="submit" className="btn btn--primary" disabled={loading}>
-            {loading ? 'Création...' : 'Créer le terrain'}
-          </button>
-        </form>
-      )}
-
-      {/* TAB: SOIL */}
-      {activeTab === 'soil' && (
-        <div>
-          <div className="terrain__select-info">
-            Terrain sélectionné : {selectedFieldId
-              ? <strong>{fields.find(f => f.id === selectedFieldId)?.nom}</strong>
-              : <span className="text-muted">Aucun — cliquez sur un terrain dans "Mes terrains"</span>
-            }
-          </div>
-          <form className="terrain__form" onSubmit={handleSoilSubmit}>
-            <div className="form-grid">
+            <div className="t-form-grid">
               {[
-                { key: 'ph',               label: 'pH du sol',           placeholder: '0 - 14' },
-                { key: 'azote',            label: 'Azote (N) mg/kg',     placeholder: 'Ex: 120' },
-                { key: 'phosphore',        label: 'Phosphore (P) mg/kg', placeholder: 'Ex: 45' },
-                { key: 'potassium',        label: 'Potassium (K) mg/kg', placeholder: 'Ex: 200' },
-                { key: 'humidite',         label: 'Humidité (%)',        placeholder: 'Ex: 35' },
-                { key: 'matiere_organique',label: 'Matière organique (%)',placeholder: 'Ex: 2.5' },
-                { key: 'temperature',      label: 'Température (°C)',    placeholder: 'Ex: 22' },
-              ].map(field => (
-                <div className="form-field" key={field.key}>
-                  <label>{field.label}</label>
+                { key: 'nom',        label: 'Nom du terrain',       type: 'text',   placeholder: 'Ex: Parcelle Nord' },
+                { key: 'superficie', label: 'Superficie (ha)',       type: 'number', placeholder: 'Ex: 5.5' },
+                { key: 'pays',       label: 'Pays',                  type: 'text',   placeholder: 'Ex: Tunisie' },
+                { key: 'region',     label: 'Région',                type: 'text',   placeholder: 'Ex: Sfax' },
+                { key: 'latitude',   label: 'Latitude',              type: 'number', placeholder: 'Ex: 34.7406' },
+                { key: 'longitude',  label: 'Longitude',             type: 'number', placeholder: 'Ex: 10.7603' },
+              ].map(f => (
+                <div className="t-field" key={f.key}>
+                  <label className="t-label">{f.label}</label>
                   <input
-                    type="number" step="0.01"
-                    placeholder={field.placeholder}
-                    value={soilForm[field.key]}
-                    onChange={e => setSoilForm({...soilForm, [field.key]: e.target.value})}
+                    className="t-input"
+                    type={f.type}
+                    step={f.type === 'number' ? '0.000001' : undefined}
+                    placeholder={f.placeholder}
+                    value={fieldForm[f.key]}
+                    onChange={e => setFieldForm({ ...fieldForm, [f.key]: e.target.value })}
                     required
                   />
                 </div>
               ))}
             </div>
-            <button type="submit" className="btn btn--primary" disabled={loading}>
-              {loading ? 'Enregistrement...' : 'Enregistrer les métriques'}
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* TAB: PLANTE */}
-      {activeTab === 'plante' && (
-        <div>
-          <div className="terrain__select-info">
-            Terrain sélectionné : {selectedFieldId
-              ? <strong>{fields.find(f => f.id === selectedFieldId)?.nom}</strong>
-              : <span className="text-muted">Aucun — cliquez sur un terrain dans "Mes terrains"</span>
-            }
           </div>
-          <form className="terrain__form" onSubmit={handlePlanteSubmit}>
-            <div className="form-grid">
-              <div className="form-field">
-                <label>Culture</label>
-                <select
-                  value={selectedPlanteId}
-                  onChange={e => setSelectedPlanteId(e.target.value)}
-                  required
-                >
-                  <option value="">Sélectionner une culture...</option>
-                  {plantes.map(p => (
-                    <option key={p.id} value={p.id}>{p.nom}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-field">
-                <label>Date de plantation</label>
-                <input
-                  type="date"
-                  value={datePlantation}
-                  onChange={e => setDatePlantation(e.target.value)}
-                  required
-                />
+
+          <div className="t-divider"><span>Métriques Sol</span></div>
+
+          <div className="t-block">
+            <div className="t-block__header">
+              <span className="t-block__num">02</span>
+              <div>
+                <h2 className="t-block__title">Composition du sol</h2>
+                <p className="t-block__desc">Laissez vide pour renseigner plus tard</p>
               </div>
             </div>
-            <button type="submit" className="btn btn--primary" disabled={loading}>
-              {loading ? 'Association...' : 'Associer la culture'}
+            <div className="t-form-grid">
+              {[
+                { key: 'ph',                label: 'pH du sol',            placeholder: '0 – 14' },
+                { key: 'azote',             label: 'Azote N (mg/kg)',      placeholder: 'Ex: 120' },
+                { key: 'phosphore',         label: 'Phosphore P (mg/kg)',  placeholder: 'Ex: 45' },
+                { key: 'potassium',         label: 'Potassium K (mg/kg)',  placeholder: 'Ex: 200' },
+                { key: 'humidite',          label: 'Humidité (%)',         placeholder: 'Ex: 35' },
+                { key: 'matiere_organique', label: 'Matière organique (%)',placeholder: 'Ex: 2.5' },
+                { key: 'temperature',       label: 'Température (°C)',     placeholder: 'Ex: 22' },
+              ].map(f => (
+                <div className="t-field" key={f.key}>
+                  <label className="t-label">{f.label}</label>
+                  <input
+                    className="t-input"
+                    type="number"
+                    step="0.01"
+                    placeholder={f.placeholder}
+                    value={soilForm[f.key]}
+                    onChange={e => setSoilForm({ ...soilForm, [f.key]: e.target.value })}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="t-actions">
+            <button type="submit" className="t-btn t-btn--primary" disabled={loading}>
+              {loading ? 'Enregistrement...' : 'Créer le terrain'}
             </button>
+            <button type="button" className="t-btn t-btn--ghost" onClick={() => setActiveTab('list')}>
+              Annuler
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* PLANTE TAB */}
+      {activeTab === 'plante' && (
+        <div className="t-section">
+          <div className="t-select-info">
+            Terrain actif :&nbsp;
+            {selectedFieldId
+              ? <strong>{fields.find(f => f.id === selectedFieldId)?.nom}</strong>
+              : <span className="t-muted">Aucun — sélectionnez un terrain dans "Mes Terrains"</span>
+            }
+          </div>
+          <form onSubmit={handlePlanteSubmit}>
+            <div className="t-block">
+              <div className="t-form-grid t-form-grid--2">
+                <div className="t-field">
+                  <label className="t-label">Culture</label>
+                  <select
+                    className="t-input"
+                    value={selectedPlanteId}
+                    onChange={e => setSelectedPlanteId(e.target.value)}
+                    required
+                  >
+                    <option value="">Sélectionner une culture...</option>
+                    {plantes.map(p => (
+                      <option key={p.id} value={p.id}>{p.nom}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="t-field">
+                  <label className="t-label">Date de plantation</label>
+                  <input
+                    className="t-input"
+                    type="date"
+                    value={datePlantation}
+                    onChange={e => setDatePlantation(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="t-actions">
+              <button type="submit" className="t-btn t-btn--primary" disabled={loading || !selectedFieldId}>
+                {loading ? 'Association...' : 'Associer la culture'}
+              </button>
+            </div>
           </form>
         </div>
       )}

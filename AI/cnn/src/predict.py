@@ -5,10 +5,18 @@ from torchvision import transforms
 from PIL import Image
 import io
 import json
-from model import build_model
+from src.model import build_model
 
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 with open("models/saved/class_names.json") as f:
     CLASS_NAMES = json.load(f)
 
