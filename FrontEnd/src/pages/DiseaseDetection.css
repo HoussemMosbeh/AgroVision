@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+.dd-page {
+  min-height: 100vh;
+  padding: 0 0 4rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #1a1f14;
+}
+
+.dd-hero {
+  position: relative;
+  padding: 3rem 2.5rem 2rem;
+  overflow: hidden;
+}
+.dd-hero__accent {
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a8d58022 0%, transparent 70%);
+  pointer-events: none;
+}
+.dd-hero__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  color: #1a1f14;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.02em;
+}
+.dd-hero__sub {
+  font-size: 0.9rem;
+  color: #7a8a6e;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.dd-section {   padding: 0 2.5rem;
+  max-width: 800px;
+  margin: 0 auto; }
+
+.dd-block {
+  background: #fff;
+  border: 1.5px solid #e0e8d8;
+  border-radius: 14px;
+  padding: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.dd-block__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.dd-block__num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: #c8ddb8;
+  line-height: 1;
+  min-width: 2.5rem;
+}
+.dd-block__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #1a1f14;
+  margin: 0 0 0.2rem;
+}
+.dd-block__desc {
+  font-size: 0.82rem;
+  color: #7a8a6e;
+  margin: 0;
+}
+.dd-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.dd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.dd-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4a5e3c;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.dd-select {
+  height: 42px;
+  box-sizing: border-box;
+}
+.dd-input, .dd-select {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid #dce5d4;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #1a1f14;
+  background: #fafcf8;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.dd-input:focus, .dd-select:focus {
+  border-color: #5a8a40;
+  box-shadow: 0 0 0 3px #5a8a4018;
+  background: #fff;
+}
+
+.dd-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #c8ddb8;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: #fafcf8;
+  width: 100%;
+  box-sizing: border-box;
+}
+.dd-upload-area:hover {
+  border-color: #5a8a40;
+  background: #f5faf0;
+}
+.dd-upload-area input { display: none; }
+.dd-upload-icon {
+  font-size: 1.8rem;
+  color: #7a8a6e;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+.dd-upload-text {
+  font-size: 0.88rem;
+  color: #4a5e3c;
+  margin: 0 0 0.25rem;
+  font-weight: 500;
+}
+.dd-upload-hint {
+  font-size: 0.78rem;
+  color: #aab8a0;
+  margin: 0;
+}
+
+.dd-preview {
+  margin-top: 1rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid #e0e8d8;
+}
+.dd-preview img {
+  width: 100%;
+  display: block;
+  max-height: 300px;
+  object-fit: cover;
+}
+
+.dd-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+
+.dd-btn {
+  padding: 0.75rem 1.8rem;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.dd-btn--primary {
+  background: #3d5c2e;
+  color: #fff;
+}
+.dd-btn--primary:hover:not(:disabled) {
+  background: #2e4522;
+  box-shadow: 0 4px 16px #3d5c2e30;
+  transform: translateY(-1px);
+}
+.dd-btn--primary:disabled {
+  background: #a0b890;
+  cursor: not-allowed;
+}
+
+.dd-alert {
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.dd-alert--err { background: #fdf0f0; color: #8b2020; border-left: 3px solid #d94f4f; }
+
+.dd-result {
+  background: #f5faf0;
+  border: 1.5px solid #c8ddb8;
+  border-radius: 14px;
+  padding: 1.8rem;
+  margin-top: 1.2rem;
+}
+.dd-result__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: #1a1f14;
+  margin: 0 0 1.2rem;
+}
+.dd-result__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+.dd-result__card {
+  background: #fff;
+  border: 1.5px solid #e0e8d8;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+}
+.dd-result__card-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7a8a6e;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 0.3rem;
+}
+.dd-result__card-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: #1a1f14;
+  margin: 0;
+}
+.dd-result__card--healthy .dd-result__card-value { color: #3d5c2e; }
+.dd-result__card--unhealthy .dd-result__card-value { color: #8b2020; }
+
+.dd-plante-info {
+  height: 42px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background: #f5faf0;
+  border: 1.5px solid #c8ddb8;
+  border-radius: 8px;
+  padding: 0 1.1rem;
+  font-size: 0.88rem;
+  color: #4a5e3c;
+}
+.dd-muted { color: #9aaa8e; font-style: italic; }

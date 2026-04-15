@@ -50,7 +50,7 @@ public class soilRequestDTO
             return potassium;
         }
 
-        public void setpotassium(BigDecimal potassium)
+        public void setPotassium(BigDecimal potassium)
         {
             this.potassium = potassium;
         }

@@ -13,7 +13,9 @@
     import org.springframework.web.bind.annotation.RequestBody;
     import org.springframework.web.bind.annotation.RequestMapping;
     import org.springframework.web.bind.annotation.RestController;
+    import org.springframework.web.server.ResponseStatusException;
     import java.util.List;
+    
     import com.example.demo.dto.fieldRequestDTO;
     import com.example.demo.model.fieldModel;
     import com.example.demo.model.userModel;
@@ -69,9 +71,12 @@
 
         private userModel getAuthenticatedUser() {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || auth.getPrincipal() == null || !(auth.getPrincipal() instanceof String)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur non authentifié");
+            }
             String email = (String) auth.getPrincipal();
             return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Utilisateur non trouvé"));
         }
     }
 

@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 pillow
-torch==2.1.0+cpu
-torchvision==0.16.0+cpu
+torch>=2.0.0
+torchvision>=0.15.0
+python-multipart

@@ -5,7 +5,15 @@ from torchvision import transforms
 from PIL import Image
 import io
 import json
-from src.model import build_model
+import sys
+import os
+
+# Add the current directory to Python path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
+project_root = os.path.dirname(current_dir)
+
+from model import build_model
 
 app = FastAPI()
 
@@ -17,12 +25,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-with open("models/saved/class_names.json") as f:
+with open(os.path.join(project_root, "models", "saved", "class_names.json")) as f:
     CLASS_NAMES = json.load(f)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = build_model(len(CLASS_NAMES))
-model.load_state_dict(torch.load("models/saved/plant_disease_model.pth", map_location=DEVICE))
+model.load_state_dict(torch.load(os.path.join(project_root, "models", "saved", "plant_disease_model.pth"), map_location=DEVICE))
 model.to(DEVICE)
 model.eval()
 

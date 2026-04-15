@@ -64,8 +64,14 @@ function Terrain() {
       setSoilForm({ ph: '', azote: '', phosphore: '', potassium: '', humidite: '', matiere_organique: '', temperature: '' })
       fetchFields()
       setActiveTab('list')
-    } catch {
-      setError('Erreur lors de la création.')
+    } catch (err) {
+      console.error('Field creation error', err)
+      setError(
+        err.response?.data?.message ||
+        err.response?.data ||
+        err.message ||
+        'Erreur lors de la création.'
+      )
     } finally {
       setLoading(false)
     }
@@ -274,7 +280,7 @@ function Terrain() {
                   >
                     <option value="">Sélectionner une culture...</option>
                     {plantes.map(p => (
-                      <option key={p.id} value={p.id}>{p.nom}</option>
+                      <option key={p.id} value={p.id}>{p.nomPlante}</option>
                     ))}
                   </select>
                 </div>

@@ -2,32 +2,19 @@ package com.example.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class CorsConfig {
 
     @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
+    public RestTemplate restTemplate() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(30000); // 30 seconds
+        factory.setReadTimeout(60000); // 60 seconds
         
-        // Autorise les requêtes depuis React
-        config.addAllowedOrigin("http://localhost:5173");
-        
-        // Autorise tous les headers
-        config.addAllowedHeader("*");
-        
-        // Autorise toutes les méthodes HTTP
-        config.addAllowedMethod("*");
-        
-        // Autorise l'envoi du token Authorization
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", config);
-        
-        return new CorsFilter(source);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        return restTemplate;
     }
 }
