@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+.pp-page {
+  min-height: 100vh;
+  padding: 0 0 4rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #1a1f14;
+}
+
+.pp-hero {
+  position: relative;
+  padding: 3rem 2.5rem 2rem;
+  overflow: hidden;
+  text-align: center;
+}
+
+.pp-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+  color: #1a1f14;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.02em;
+}
+
+.pp-sub {
+  font-size: 0.9rem;
+  color: #7a8a6e;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.pp-error {
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: #fdf0f0;
+  color: #8b2020;
+  border-left: 3px solid #d94f4f;
+}
+
+.pp-card {
+  background: #fff;
+  border: 1.5px solid #e0e8d8;
+  border-radius: 14px;
+  padding: 1.8rem;
+  max-width: 600px;
+  margin: 0 auto 1.2rem;
+}
+
+.pp-block__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pp-block__num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  color: #c8ddb8;
+  line-height: 1;
+  min-width: 2.5rem;
+}
+
+.pp-block__title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #1a1f14;
+  margin: 0 0 0.2rem;
+}
+
+.pp-block__desc {
+  font-size: 0.82rem;
+  color: #7a8a6e;
+  margin: 0;
+}
+
+.pp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.pp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.pp-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4a5e3c;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pp-select {
+  height: 42px;
+  padding: 0 0.9rem;
+  border: 1.5px solid #dce5d4;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: #1a1f14;
+  background: #fafcf8;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.pp-select:focus {
+  border-color: #5a8a40;
+  box-shadow: 0 0 0 3px #5a8a4018;
+  background: #fff;
+}
+
+.pp-crop-info {
+  height: 42px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background: #f5faf0;
+  border: 1.5px solid #c8ddb8;
+  border-radius: 8px;
+  padding: 0 1.1rem;
+  font-size: 0.88rem;
+  color: #4a5e3c;
+}
+
+.pp-muted {
+  color: #9aaa8e;
+  font-style: italic;
+}
+
+.pp-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.pp-btn {
+  padding: 0.75rem 1.8rem;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: #3d5c2e;
+  color: #fff;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.pp-btn:hover:not(:disabled) {
+  background: #2e4522;
+  box-shadow: 0 4px 16px #3d5c2e30;
+  transform: translateY(-1px);
+}
+
+.pp-btn:disabled {
+  background: #a0b890;
+  cursor: not-allowed;
+}
+
+.pp-result {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pp-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.pp-result-header h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  margin: 0;
+  color: #1a1f14;
+}
+
+.pp-quality-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.pp-quality-high   { background: #edf7e6; color: #2d6a1f; }
+.pp-quality-medium { background: #fef9e6; color: #7a5c00; }
+.pp-quality-low    { background: #fdf0f0; color: #8b2020; }
+
+.pp-yield-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f5faf0;
+  border: 1.5px solid #c8ddb8;
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.pp-yield-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7a8a6e;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.pp-yield-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3.5rem;
+  color: #3d5c2e;
+  line-height: 1;
+}
+
+.pp-yield-unit {
+  font-size: 0.9rem;
+  color: #7a8a6e;
+  margin-top: 0.3rem;
+}
+
+.pp-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.pp-box {
+  background: #fff;
+  border: 1.5px solid #e0e8d8;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pp-box-icon { font-size: 1.2rem; }
+
+.pp-box-label {
+  font-size: 0.78rem;
+  color: #7a8a6e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.pp-box strong {
+  font-size: 1.1rem;
+  color: #1a1f14;
+}
+
+.pp-quality-bar-section {
+  background: #fff;
+  border: 1.5px solid #e0e8d8;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+}
+
+.pp-quality-bar-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #7a8a6e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1rem;
+}
+
+.pp-quality-bar-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 40px;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.7rem;
+  font-size: 0.88rem;
+  color: #4a5e3c;
+}
+
+.pp-bar-track {
+  background: #f0f5eb;
+  border-radius: 20px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.pp-bar-fill {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.6s ease;
+}
+
+.pp-bar-high   { background: #5aad3f; }
+.pp-bar-medium { background: #e6a817; }
+.pp-bar-low    { background: #d94f4f; }

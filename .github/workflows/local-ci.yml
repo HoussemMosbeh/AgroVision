@@ -1,9 +1,11 @@
 name: Local CI/CD
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
 jobs:
   build-and-test:
     runs-on: self-hosted
@@ -17,17 +19,20 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USER }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Setup JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: temurin
+
       - name: Build & Test Backend
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}
@@ -36,31 +41,39 @@ jobs:
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
-          mvn test
+
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Build Frontend
         run: |
           cd FrontEnd
           npm install
           npm run build
+
       - name: Test CNN
         run: |
           cd AI/cnn
-          pip install -r requirements.txt
-          python -m unittest discover
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
+
       - name: Test XGBoost
         run: |
           cd AI/xgboost
-          pip install -r requirements.txt
-          python -m unittest discover
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
+
   docker-compose-up:
     runs-on: self-hosted
     needs: build-and-test
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Create .env file
         run: |
           echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
@@ -70,7 +83,12 @@ jobs:
           echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
           echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
           echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
+
       - name: Build & Start Containers
         run: |
           docker compose down
           docker compose up -d --build
+
+      - name: Cleanup
+        if: always()
+        run: rm -f .env

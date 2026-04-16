@@ -40,10 +40,15 @@ services:
     volumes:
       - ./AI/cnn/models:/app/models
 
-  xgboost:
-    build: ./AI/xgboost
+  xgboost-service:
+    build:
+      context: ./AI/xgboost
+    container_name: xgboost-service
     ports:
-      - "${XGBOOST_PORT}:5001"
-
+      - "8001:8001"
+    networks:
+      - agrovision-network
+    restart: unless-stopped
+    
 volumes:
   pgdata:
