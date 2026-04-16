@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import './Home.css'
 
 const features = [
@@ -7,21 +6,21 @@ const features = [
     icon: '🌾',
     title: 'Gestion des terrains',
     description: 'Ajoutez vos parcelles, suivez leur superficie, localisation et cultures associées.',
-    path: '/terrain',
+    path: '/app/terrain',
     color: 'green',
   },
   {
     icon: '🔬',
     title: 'Détection des maladies',
     description: 'Uploadez une photo de votre plante — notre IA CNN identifie la maladie en secondes.',
-    path: '/disease',
+    path: '/app/disease',
     color: 'purple',
   },
   {
     icon: '📈',
     title: 'Prédiction de rendement',
     description: 'Notre modèle XGBoost prédit votre rendement selon les données sol et climat.',
-    path: '/yield',
+    path: '/app/yield',
     color: 'amber',
   },
 ]
@@ -35,7 +34,6 @@ const stats = [
 
 function Home() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
 
   return (
     <div className="home">
@@ -55,13 +53,13 @@ function Home() {
           <div className="hero__actions">
             <button
               className="btn btn--primary"
-              onClick={() => navigate('/terrain')}
+              onClick={() => navigate('/app/terrain')}
             >
               Gérer mes terrains
             </button>
             <button
               className="btn btn--outline"
-              onClick={() => navigate('/disease')}
+              onClick={() => navigate('/app/disease')}
             >
               Détecter une maladie
             </button>

@@ -7,6 +7,8 @@ import YieldPrediction from './pages/YieldPrediction'
 import DiseaseDetection from './pages/DiseaseDetection'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import LandingPage from './pages/LandingPage'
+import LogoutPage from './pages/LogoutPage'
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth()
@@ -17,9 +19,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/" element={
+        <Route path="/logout" element={<LogoutPage />} />
+        <Route path="/app" element={
           <ProtectedRoute><DashboardLayout /></ProtectedRoute>
         }>
           <Route index element={<Home />} />

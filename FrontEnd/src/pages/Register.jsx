@@ -22,7 +22,7 @@ function Register() {
 
     try {
       await register(nom, prenom, email, password)
-      navigate('/')          // redirect to dashboard after register
+      navigate('/app')          // redirect to dashboard after register
     } catch (err) {
       setError('Registration failed. Email may already be in use.')
     } finally {

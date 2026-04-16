@@ -11,6 +11,11 @@
   z-index: 10;
 }
 .navbar__title { font-weight: 600; }
+.navbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
 .navbar__badge {
   background: var(--color-primary-lt);
   color: #fff;
@@ -18,4 +23,21 @@
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 999px;
+}
+
+.navbar__logout {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.navbar__logout:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }

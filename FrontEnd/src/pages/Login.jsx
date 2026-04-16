@@ -19,7 +19,7 @@ function Login() {
 
     try {
       await login(email, password)
-      navigate('/')          // redirect to dashboard on success
+      navigate('/app')          // redirect to dashboard on success
     } catch (err) {
       setError('Invalid email or password. Please try again.')
     } finally {

@@ -3,10 +3,10 @@ import { MdHome, MdTerrain, MdGrass, MdBiotech } from 'react-icons/md'
 import './Sidebar.css'
 
 const navItems = [
-  { to: '/',        icon: <MdHome />,    label: 'Accueil'         },
-  { to: '/terrain', icon: <MdTerrain />, label: 'Mes Terrains'    },
-  { to: '/yield',   icon: <MdGrass />,   label: 'Prédiction'      },
-  { to: '/disease', icon: <MdBiotech />, label: 'Détection'       },
+  { to: '/app',         icon: <MdHome />,    label: 'Accueil'      },
+  { to: '/app/terrain', icon: <MdTerrain />, label: 'Mes Terrains' },
+  { to: '/app/yield',   icon: <MdGrass />,   label: 'Prédiction'   },
+  { to: '/app/disease', icon: <MdBiotech />, label: 'Détection'    },
 ]
 
 function Sidebar() {
@@ -18,7 +18,7 @@ function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
+            end={item.to === '/app'}
             className={({ isActive }) =>
               `sidebar__link ${isActive ? 'sidebar__link--active' : ''}`
             }
