@@ -4,10 +4,10 @@ import { FaBars, FaChartLine, FaFlask, FaGlobeAfrica, FaTimes } from 'react-icon
 import './Home.css'
 
 const NAV_LINKS = [
-  { label: 'Accueil', path: '/app' },
-  { label: 'Terrains', path: '/app/terrain' },
-  { label: 'Détection', path: '/app/disease' },
-  { label: 'Prédiction', path: '/app/yield' },
+  { label: 'Accueil', path: '/' },
+  { label: 'Terrains', path: '/terrain' },
+  { label: 'Détection', path: '/detection' },
+  { label: 'Prédiction', path: '/prediction' },
 ]
 
 const STATS = [
@@ -23,21 +23,21 @@ const FEATURES = [
     title: 'Gestion des terrains',
     description:
       'Créez et gérez vos parcelles avec localisation, superficie et historique des cultures sur une interface claire.',
-    path: '/app/terrain',
+    path: '/terrain',
   },
   {
     icon: <FaFlask aria-hidden="true" />,
     title: 'Détection maladies',
     description:
       "Analysez les feuilles en quelques secondes via notre modèle CNN pour identifier rapidement les risques.",
-    path: '/app/disease',
+    path: '/detection',
   },
   {
     icon: <FaChartLine aria-hidden="true" />,
     title: 'Prédiction rendement',
     description:
       'Exploitez vos données de sol et météo avec l IA XGBoost pour anticiper rendement et qualité de récolte.',
-    path: '/app/yield',
+    path: '/prediction',
   },
 ]
 
@@ -70,48 +70,11 @@ function Home() {
 
   return (
     <div className="home">
-      {/* Barre de navigation principale */}
-      <header className={`home__navbar ${isScrolled ? 'home__navbar--scrolled' : ''}`}>
-        <div className="home__container home__navbar-inner">
-          <button type="button" className="home__logo" onClick={() => goTo('/app')}>
-            <span className="home__logo-icon" aria-hidden="true">🌱</span>
-            <span>AgroVision</span>
-          </button>
-
-          <nav className={`home__nav ${isMenuOpen ? 'home__nav--open' : ''}`}>
-            {NAV_LINKS.map((link) => (
-              <button
-                key={link.label}
-                type="button"
-                className="home__nav-link"
-                onClick={() => goTo(link.path)}
-              >
-                {link.label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="home__nav-actions">
-            <button type="button" className="home__btn home__btn--primary" onClick={() => goTo('/register')}>
-              Commencer
-            </button>
-            <button
-              type="button"
-              className="home__menu-toggle"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              aria-label="Ouvrir le menu"
-            >
-              {isMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Section hero avec proposition de valeur */}
       <section className="home__hero">
         <div className="home__container home__hero-grid">
           <div className="home__hero-content">
-            <span className="home__badge">🤖 Powered by AI</span>
+            <span className="home__badge"> Powered by AI</span>
             <h1 className="home__title">
               Cultivez mieux avec l intelligence{' '}
               <span className="home__title-highlight">artificielle</span>
@@ -120,25 +83,6 @@ function Home() {
               AgroVision vous aide a piloter vos terrains, suivre la sante des sols, detecter
               les maladies de vos plantes et predire le rendement avec des modeles IA fiables.
             </p>
-
-            <div className="home__hero-cta">
-              <button
-                type="button"
-                className="home__btn home__btn--primary"
-                onClick={() => goTo('/app/terrain')}
-              >
-                Gérer mes terrains
-              </button>
-              <button type="button" className="home__btn home__btn--outline">
-                Voir une démo
-              </button>
-            </div>
-
-            <div className="home__trust">
-              <span>✓ Gratuit</span>
-              <span>✓ Sans installation</span>
-              <span>✓ Résultats immédiats</span>
-            </div>
           </div>
 
           <div className="home__hero-visual">
@@ -237,9 +181,9 @@ function Home() {
           </div>
 
           <div className="home__footer-links">
-            <button type="button" onClick={() => goTo('/app/terrain')}>Terrains</button>
-            <button type="button" onClick={() => goTo('/app/disease')}>Détection</button>
-            <button type="button" onClick={() => goTo('/app/yield')}>Prédiction</button>
+            <button type="button" onClick={() => goTo('/terrain')}>Terrains</button>
+            <button type="button" onClick={() => goTo('/detection')}>Détection</button>
+            <button type="button" onClick={() => goTo('/prediction')}>Prédiction</button>
           </div>
 
           <p className="home__footer-copy">© 2025 AgroVision. Tous droits réservés.</p>
