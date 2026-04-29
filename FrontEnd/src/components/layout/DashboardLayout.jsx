@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom'
-import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 import './DashboardLayout.css'
 
@@ -8,7 +7,6 @@ function DashboardLayout() {
     <div className="layout">
       <Sidebar />
       <div className="layout__main">
-        <Navbar />
         <main className="layout__content">
           <Outlet />
         </main>
