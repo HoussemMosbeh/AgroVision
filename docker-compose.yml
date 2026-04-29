@@ -13,13 +13,13 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: agrovision_test
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: AgroVision
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 123
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U testuser"
+          --health-cmd="pg_isready -U postgres"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -34,9 +34,9 @@ jobs:
 
       - name: Build & Test Backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/agrovision_test
-          SPRING_DATASOURCE_USERNAME: testuser
-          SPRING_DATASOURCE_PASSWORD: testpass
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/AgroVision
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: 123
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
@@ -75,13 +75,13 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "POSTGRES_DB=agrovision" >> .env
-          echo "POSTGRES_USER=agrovision_user" >> .env
-          echo "POSTGRES_PASSWORD=change_this_password" >> .env
+          echo "POSTGRES_DB=AgroVision" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=123" >> .env
           echo "BACKEND_PORT=8080" >> .env
-          echo "FRONTEND_PORT=5173" >> .env
+          echo "FRONTEND_PORT=3000" >> .env
           echo "CNN_PORT=8000" >> .env
-          echo "XGBOOST_PORT=8001" >> .env
+          echo "XGBOOST_PORT=5001" >> .env
 
       - name: Build & Start Containers
         run: |
