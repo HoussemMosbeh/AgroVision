@@ -4,39 +4,39 @@ import { FaBars, FaChartLine, FaFlask, FaGlobeAfrica, FaTimes } from 'react-icon
 import './Home.css'
 
 const NAV_LINKS = [
-  { label: 'Accueil', path: '/app' },
-  { label: 'Terrains', path: '/app/terrain' },
-  { label: 'Détection', path: '/app/disease' },
-  { label: 'Prédiction', path: '/app/yield' },
+  { label: 'Home', path: '/app' },
+  { label: 'Fields', path: '/app/terrain' },
+  { label: 'Disease Detection', path: '/app/disease' },
+  { label: 'Yield Prediction', path: '/app/yield' },
 ]
 
 const STATS = [
-  { value: '95%', label: 'Précision CNN' },
-  { value: '10K+', label: 'Agriculteurs' },
-  { value: '50+', label: 'Cultures' },
-  { value: '24/7', label: 'Disponible' },
+  { value: '95%', label: 'CNN Accuracy' },
+  { value: '10K+', label: 'Farmers' },
+  { value: '50+', label: 'Crops tracked' },
+  { value: '24/7', label: 'Available' },
 ]
 
 const FEATURES = [
   {
     icon: <FaGlobeAfrica aria-hidden="true" />,
-    title: 'Gestion des terrains',
+    title: 'Field management',
     description:
-      'Créez et gérez vos parcelles avec localisation, superficie et historique des cultures sur une interface claire.',
+      'Create and manage your fields with location, area, and crop history—on one clear interface.',
     path: '/app/terrain',
   },
   {
     icon: <FaFlask aria-hidden="true" />,
-    title: 'Détection maladies',
+    title: 'Disease detection',
     description:
-      "Analysez les feuilles en quelques secondes via notre modèle CNN pour identifier rapidement les risques.",
+      'Analyze plant leaves in seconds using our CNN model to quickly spot risks.',
     path: '/app/disease',
   },
   {
     icon: <FaChartLine aria-hidden="true" />,
-    title: 'Prédiction rendement',
+    title: 'Yield prediction',
     description:
-      'Exploitez vos données de sol et météo avec l IA XGBoost pour anticiper rendement et qualité de récolte.',
+      'Leverage your soil and climate data with our XGBoost model to forecast yield and harvest quality.',
     path: '/app/yield',
   },
 ]
@@ -48,7 +48,7 @@ function Home() {
   const [statsVisible, setStatsVisible] = useState(false)
 
   useEffect(() => {
-    // Gestion de l ombre de la navbar au scroll
+    // Handle navbar shadow on scroll
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 8)
     }
@@ -58,7 +58,7 @@ function Home() {
   }, [])
 
   useEffect(() => {
-    // Apparition progressive de la barre de statistiques
+    // Progressive stats bar reveal on page load
     const timer = window.setTimeout(() => setStatsVisible(true), 180)
     return () => window.clearTimeout(timer)
   }, [])
@@ -70,7 +70,7 @@ function Home() {
 
   return (
     <div className="home">
-      {/* Barre de navigation principale */}
+      {/* Main navigation bar */}
       <header className={`home__navbar ${isScrolled ? 'home__navbar--scrolled' : ''}`}>
         <div className="home__container home__navbar-inner">
           <button type="button" className="home__logo" onClick={() => goTo('/app')}>
@@ -92,8 +92,12 @@ function Home() {
           </nav>
 
           <div className="home__nav-actions">
-            <button type="button" className="home__btn home__btn--primary" onClick={() => goTo('/register')}>
-              Commencer
+            <button
+              type="button"
+              className="home__btn home__btn--primary"
+              onClick={() => goTo('/register')}
+            >
+              Get started
             </button>
             <button
               type="button"
@@ -107,18 +111,18 @@ function Home() {
         </div>
       </header>
 
-      {/* Section hero avec proposition de valeur */}
+      {/* Hero section */}
       <section className="home__hero">
         <div className="home__container home__hero-grid">
           <div className="home__hero-content">
             <span className="home__badge">🤖 Powered by AI</span>
             <h1 className="home__title">
-              Cultivez mieux avec l intelligence{' '}
-              <span className="home__title-highlight">artificielle</span>
+              Cultivate better with AI{' '}
+              <span className="home__title-highlight">intelligence</span>
             </h1>
             <p className="home__subtitle">
-              AgroVision vous aide a piloter vos terrains, suivre la sante des sols, detecter
-              les maladies de vos plantes et predire le rendement avec des modeles IA fiables.
+              AgroVision helps you manage your fields, track soil health, detect plant diseases,
+              and predict yield with reliable AI models.
             </p>
 
             <div className="home__hero-cta">
@@ -127,46 +131,46 @@ function Home() {
                 className="home__btn home__btn--primary"
                 onClick={() => goTo('/app/terrain')}
               >
-                Gérer mes terrains
+                Manage my fields
               </button>
               <button type="button" className="home__btn home__btn--outline">
-                Voir une démo
+                See a demo
               </button>
             </div>
 
             <div className="home__trust">
-              <span>✓ Gratuit</span>
-              <span>✓ Sans installation</span>
-              <span>✓ Résultats immédiats</span>
+              <span>✓ Free</span>
+              <span>✓ No installation</span>
+              <span>✓ Instant results</span>
             </div>
           </div>
 
           <div className="home__hero-visual">
             <div className="home__hero-circle" aria-hidden="true" />
             <article className="home__prediction-card">
-              <h3 className="home__prediction-title">Prédiction IA</h3>
+              <h3 className="home__prediction-title">AI Prediction</h3>
               <div className="home__prediction-row">
-                <span>Culture</span>
-                <strong>Blé</strong>
+                <span>Crop</span>
+                <strong>Wheat</strong>
               </div>
               <div className="home__prediction-row">
-                <span>Rendement</span>
+                <span>Yield</span>
                 <strong>4.2 T/ha</strong>
               </div>
               <div className="home__prediction-row">
-                <span>Confiance</span>
+                <span>Confidence</span>
                 <strong>94%</strong>
               </div>
               <div className="home__prediction-status">
                 <span className="home__pulse-dot" />
-                En cours d analyse...
+                Analyzing...
               </div>
             </article>
           </div>
         </div>
       </section>
 
-      {/* Barre de statistiques */}
+      {/* Stats bar */}
       <section className={`home__stats ${statsVisible ? 'home__stats--visible' : ''}`}>
         <div className="home__container home__stats-grid">
           {STATS.map((stat) => (
@@ -178,10 +182,10 @@ function Home() {
         </div>
       </section>
 
-      {/* Section des fonctionnalites */}
+      {/* Features */}
       <section className="home__features">
         <div className="home__container">
-          <h2 className="home__section-title">Tout ce dont vous avez besoin</h2>
+          <h2 className="home__section-title">Everything you need</h2>
           <div className="home__features-grid">
             {FEATURES.map((feature) => (
               <article className="home__feature-card" key={feature.title}>
@@ -193,7 +197,7 @@ function Home() {
                   className="home__feature-link"
                   onClick={() => goTo(feature.path)}
                 >
-                  Accéder →
+                  Access →
                 </button>
               </article>
             ))}
@@ -201,29 +205,29 @@ function Home() {
         </div>
       </section>
 
-      {/* Section du fonctionnement en trois etapes */}
+      {/* How it works */}
       <section className="home__steps">
         <div className="home__container">
-          <h2 className="home__section-title">Comment ça marche ?</h2>
+          <h2 className="home__section-title">How it works</h2>
           <div className="home__steps-line" aria-hidden="true" />
           <div className="home__steps-grid">
             <article className="home__step">
               <span className="home__step-number">1</span>
-              <h3>Créez votre terrain</h3>
+              <h3>Create your field</h3>
             </article>
             <article className="home__step">
               <span className="home__step-number">2</span>
-              <h3>Ajoutez vos données</h3>
+              <h3>Add your data</h3>
             </article>
             <article className="home__step">
               <span className="home__step-number">3</span>
-              <h3>Obtenez les prédictions IA</h3>
+              <h3>Get AI predictions</h3>
             </article>
           </div>
         </div>
       </section>
 
-      {/* Pied de page */}
+      {/* Footer */}
       <footer className="home__footer">
         <div className="home__container home__footer-inner">
           <div className="home__footer-brand">
@@ -232,17 +236,17 @@ function Home() {
               <span>AgroVision</span>
             </p>
             <p className="home__footer-tagline">
-              L intelligence agricole de nouvelle generation.
+              Next-generation agricultural intelligence.
             </p>
           </div>
 
           <div className="home__footer-links">
-            <button type="button" onClick={() => goTo('/app/terrain')}>Terrains</button>
-            <button type="button" onClick={() => goTo('/app/disease')}>Détection</button>
-            <button type="button" onClick={() => goTo('/app/yield')}>Prédiction</button>
+            <button type="button" onClick={() => goTo('/app/terrain')}>Fields</button>
+            <button type="button" onClick={() => goTo('/app/disease')}>Disease</button>
+            <button type="button" onClick={() => goTo('/app/yield')}>Yield</button>
           </div>
 
-          <p className="home__footer-copy">© 2025 AgroVision. Tous droits réservés.</p>
+          <p className="home__footer-copy">© 2025 AgroVision. All rights reserved.</p>
         </div>
       </footer>
     </div>

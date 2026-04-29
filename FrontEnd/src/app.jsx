@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
-import DashboardLayout from './components/layout/DashboardLayout'
 import Home from './pages/Home'
 import Terrain from './pages/Terrain'
 import YieldPrediction from './pages/YieldPrediction'
@@ -23,14 +22,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/logout" element={<LogoutPage />} />
-        <Route path="/app" element={
-          <ProtectedRoute><DashboardLayout /></ProtectedRoute>
-        }>
-          <Route index element={<Home />} />
-          <Route path="terrain" element={<Terrain />} />
-          <Route path="yield" element={<YieldPrediction />} />
-          <Route path="disease" element={<DiseaseDetection />} />
-        </Route>
+        <Route path="/app" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/app/terrain" element={<ProtectedRoute><Terrain /></ProtectedRoute>} />
+        <Route path="/app/yield" element={<ProtectedRoute><YieldPrediction /></ProtectedRoute>} />
+        <Route path="/app/disease" element={<ProtectedRoute><DiseaseDetection /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )
