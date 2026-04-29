@@ -4,10 +4,10 @@ import { FaBars, FaChartLine, FaFlask, FaGlobeAfrica, FaTimes } from 'react-icon
 import './Home.css'
 
 const NAV_LINKS = [
-  { label: 'Accueil', path: '/' },
-  { label: 'Terrains', path: '/terrain' },
-  { label: 'Détection', path: '/detection' },
-  { label: 'Prédiction', path: '/prediction' },
+  { label: 'Accueil', path: '/app' },
+  { label: 'Terrains', path: '/app/terrain' },
+  { label: 'Détection', path: '/app/disease' },
+  { label: 'Prédiction', path: '/app/yield' },
 ]
 
 const STATS = [
@@ -23,21 +23,21 @@ const FEATURES = [
     title: 'Gestion des terrains',
     description:
       'Créez et gérez vos parcelles avec localisation, superficie et historique des cultures sur une interface claire.',
-    path: '/terrain',
+    path: '/app/terrain',
   },
   {
     icon: <FaFlask aria-hidden="true" />,
     title: 'Détection maladies',
     description:
       "Analysez les feuilles en quelques secondes via notre modèle CNN pour identifier rapidement les risques.",
-    path: '/detection',
+    path: '/app/disease',
   },
   {
     icon: <FaChartLine aria-hidden="true" />,
     title: 'Prédiction rendement',
     description:
       'Exploitez vos données de sol et météo avec l IA XGBoost pour anticiper rendement et qualité de récolte.',
-    path: '/prediction',
+    path: '/app/yield',
   },
 ]
 
@@ -73,7 +73,7 @@ function Home() {
       {/* Barre de navigation principale */}
       <header className={`home__navbar ${isScrolled ? 'home__navbar--scrolled' : ''}`}>
         <div className="home__container home__navbar-inner">
-          <button type="button" className="home__logo" onClick={() => goTo('/')}>
+          <button type="button" className="home__logo" onClick={() => goTo('/app')}>
             <span className="home__logo-icon" aria-hidden="true">🌱</span>
             <span>AgroVision</span>
           </button>
@@ -122,7 +122,11 @@ function Home() {
             </p>
 
             <div className="home__hero-cta">
-              <button type="button" className="home__btn home__btn--primary" onClick={() => goTo('/terrain')}>
+              <button
+                type="button"
+                className="home__btn home__btn--primary"
+                onClick={() => goTo('/app/terrain')}
+              >
                 Gérer mes terrains
               </button>
               <button type="button" className="home__btn home__btn--outline">
@@ -233,9 +237,9 @@ function Home() {
           </div>
 
           <div className="home__footer-links">
-            <button type="button" onClick={() => goTo('/terrain')}>Terrains</button>
-            <button type="button" onClick={() => goTo('/detection')}>Détection</button>
-            <button type="button" onClick={() => goTo('/prediction')}>Prédiction</button>
+            <button type="button" onClick={() => goTo('/app/terrain')}>Terrains</button>
+            <button type="button" onClick={() => goTo('/app/disease')}>Détection</button>
+            <button type="button" onClick={() => goTo('/app/yield')}>Prédiction</button>
           </div>
 
           <p className="home__footer-copy">© 2025 AgroVision. Tous droits réservés.</p>
