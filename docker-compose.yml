@@ -9,22 +9,34 @@ on:
 jobs:
   build-and-test:
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: AgroVision
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 123
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    
     steps:
       - uses: actions/checkout@v4
+
+      - name: Load .env file
+        run: |
+          if [ -f .env ]; then
+            echo "Loading .env file"
+            cat .env >> $GITHUB_ENV
+          else
+            echo "No .env file found"
+            echo "POSTGRES_DB=AgroVision" >> $GITHUB_ENV
+            echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
+            echo "POSTGRES_PASSWORD=123" >> $GITHUB_ENV
+          fi
+
+      - name: Start PostgreSQL
+        run: |
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_DB=${{ env.POSTGRES_DB }} \
+            -e POSTGRES_USER=${{ env.POSTGRES_USER }} \
+            -e POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} \
+            -p 5432:5432 \
+            postgres:15
+          
+          # Wait for PostgreSQL to be ready
+          sleep 10
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -34,9 +46,9 @@ jobs:
 
       - name: Build & Test Backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/AgroVision
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
@@ -66,6 +78,12 @@ jobs:
           .venv/bin/pip install -r requirements.txt
           .venv/bin/python -m unittest discover
 
+      - name: Cleanup PostgreSQL
+        if: always()
+        run: |
+          docker stop postgres || true
+          docker rm postgres || true
+
   docker-compose-up:
     runs-on: self-hosted
     needs: build-and-test
@@ -73,15 +91,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create .env file
+      - name: Load .env file
         run: |
-          echo "POSTGRES_DB=AgroVision" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" >> .env
-          echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-          echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
-          echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
+          if [ -f .env ]; then
+            echo "Loading .env file"
+            cat .env >> $GITHUB_ENV
+          else
+            echo "POSTGRES_DB=AgroVision" >> $GITHUB_ENV
+            echo "POSTGRES_USER=postgres" >> $GITHUB_ENV
+            echo "POSTGRES_PASSWORD=123" >> $GITHUB_ENV
+            echo "BACKEND_PORT=8080" >> $GITHUB_ENV
+            echo "FRONTEND_PORT=3000" >> $GITHUB_ENV
+            echo "CNN_PORT=8000" >> $GITHUB_ENV
+            echo "XGBOOST_PORT=5001" >> $GITHUB_ENV
+          fi
+
+      - name: Create .env file for Docker Compose
+        run: |
+          echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" > .env
+          echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> .env
+          echo "BACKEND_PORT=${{ env.BACKEND_PORT }}" >> .env
+          echo "FRONTEND_PORT=${{ env.FRONTEND_PORT }}" >> .env
+          echo "CNN_PORT=${{ env.CNN_PORT }}" >> .env
+          echo "XGBOOST_PORT=${{ env.XGBOOST_PORT }}" >> .env
 
       - name: Build & Start Containers
         run: |
