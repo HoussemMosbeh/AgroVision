@@ -316,7 +316,7 @@
 
 /* Section fonctionnalites */
 .home__features {
-  padding: calc(var(--space-xl) + var(--space-lg)) 0;
+  padding: calc(var(--space-xl) * 2.5) 0;
 }
 
 .home__section-title {
@@ -379,7 +379,7 @@
 
 /* Section comment ca marche */
 .home__steps {
-  padding: 0 0 calc(var(--space-xl) + var(--space-lg));
+  padding: 0 0 calc(var(--space-xl) * 2.5);
 }
 
 .home__steps-line {
