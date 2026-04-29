@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import DashboardLayout from './components/layout/DashboardLayout'
+import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Terrain from './pages/Terrain'
 import YieldPrediction from './pages/YieldPrediction'
@@ -31,7 +32,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Dashboard />} />
+          <Route index element={<Home />} />
           <Route path="terrain" element={<Terrain />} />
           <Route path="yield" element={<YieldPrediction />} />
           <Route path="disease" element={<DiseaseDetection />} />
