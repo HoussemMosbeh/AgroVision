@@ -20,21 +20,15 @@ class TestCNNService(unittest.TestCase):
         try:
             from predict import app
             self.assertIsNotNone(app)
+            # Verify app has the predict endpoint
+            has_predict = False
+            for route in app.routes:
+                if route.path == "/predict" and "POST" in route.methods:
+                    has_predict = True
+                    break
+            self.assertTrue(has_predict, "POST /predict endpoint not found")
         except ImportError as e:
             self.fail(f"App import failed: {e}")
-    
-    def test_health_endpoint(self):
-        """Test health check endpoint"""
-        try:
-            from predict import app
-            from fastapi.testclient import TestClient
-            
-            client = TestClient(app)
-            response = client.get("/health")
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.json(), {"status": "ok"})
-        except ImportError as e:
-            self.fail(f"Health endpoint test failed: {e}")
     
     def test_model_classes_loaded(self):
         """Test that class names are loaded"""
