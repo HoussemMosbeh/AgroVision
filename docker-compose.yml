@@ -9,54 +9,56 @@ on:
 jobs:
   build-and-test:
     runs-on: self-hosted
-    env:
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: agrovision_test
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U postgres"
+          --health-cmd="pg_isready -U testuser"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: temurin
+
       - name: Build & Test Backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
-          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER }}
-          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/agrovision_test
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpass
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
+
       - name: Build Frontend
         run: |
           cd FrontEnd
           npm install
           npm run build
+
       - name: Test CNN
         run: |
           cd AI/cnn
           python -m venv .venv
           .venv/bin/pip install -r requirements.txt
           .venv/bin/python -m unittest discover
+
       - name: Test XGBoost
         run: |
           cd AI/xgboost
@@ -67,21 +69,25 @@ jobs:
   docker-compose-up:
     runs-on: self-hosted
     needs: build-and-test
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Create .env file
         run: |
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" >> .env
-          echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-          echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
-          echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
+          echo "POSTGRES_DB=agrovision" >> .env
+          echo "POSTGRES_USER=agrovision_user" >> .env
+          echo "POSTGRES_PASSWORD=change_this_password" >> .env
+          echo "BACKEND_PORT=8080" >> .env
+          echo "FRONTEND_PORT=5173" >> .env
+          echo "CNN_PORT=8000" >> .env
+          echo "XGBOOST_PORT=8001" >> .env
+
       - name: Build & Start Containers
         run: |
           docker compose down
           docker compose up -d --build
+
       - name: Cleanup
         if: always()
         run: rm -f .env
