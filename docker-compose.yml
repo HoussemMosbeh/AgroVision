@@ -1,97 +1,71 @@
-name: Local CI/CD
+version: '3.8'
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+services:
+  postgres:
+    image: postgres:15
+    container_name: agrovision-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-AgroVision}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - agrovision-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-jobs:
-  build-and-test:
-    runs-on: self-hosted
-    
-    steps:
-      - uses: actions/checkout@v4
+  backend:
+    build: ./BackEnd/AgroVision
+    container_name: agrovision-backend
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-AgroVision}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-123}
+      CNN_SERVICE_URL: http://cnn-service:8000
+      XGBOOST_SERVICE_URL: http://xgboost-service:8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - agrovision-network
 
-      - name: Start PostgreSQL
-        run: |
-          docker run -d \
-            --name postgres \
-            -e POSTGRES_DB=AgroVision \
-            -e POSTGRES_USER=postgres \
-            -e POSTGRES_PASSWORD=123 \
-            -p 5432:5432 \
-            postgres:15
-          sleep 10
+  cnn-service:
+    build: ./AI/cnn
+    container_name: agrovision-cnn
+    ports:
+      - "${CNN_PORT:-8000}:8000"
+    networks:
+      - agrovision-network
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: temurin
+  xgboost-service:
+    build: ./AI/xgboost
+    container_name: agrovision-xgboost
+    ports:
+      - "${XGBOOST_PORT:-8001}:8001"
+    networks:
+      - agrovision-network
 
-      - name: Build & Test Backend
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/AgroVision
-          SPRING_DATASOURCE_USERNAME: postgres
-          SPRING_DATASOURCE_PASSWORD: 123
-        run: |
-          cd BackEnd/AgroVision
-          mvn clean package -e
+  frontend:
+    build: ./FrontEnd
+    container_name: agrovision-frontend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - backend
+    networks:
+      - agrovision-network
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+volumes:
+  postgres_data:
 
-      - name: Build Frontend
-        run: |
-          cd FrontEnd
-          npm install
-          npm run build
-
-      - name: Test CNN
-        run: |
-          cd AI/cnn
-          python -m venv .venv
-          .venv/bin/pip install -r requirements.txt
-          .venv/bin/python -m unittest discover
-
-      - name: Test XGBoost
-        run: |
-          cd AI/xgboost
-          python -m venv .venv
-          .venv/bin/pip install -r requirements.txt
-          .venv/bin/python -m unittest discover
-
-      - name: Cleanup PostgreSQL
-        if: always()
-        run: |
-          docker stop postgres || true
-          docker rm postgres || true
-
-  docker-compose-up:
-    runs-on: self-hosted
-    needs: build-and-test
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Create .env file
-        run: |
-          echo "POSTGRES_DB=AgroVision" > .env
-          echo "POSTGRES_USER=postgres" >> .env
-          echo "POSTGRES_PASSWORD=123" >> .env
-          echo "BACKEND_PORT=8080" >> .env
-          echo "FRONTEND_PORT=5173" >> .env
-          echo "CNN_PORT=8000" >> .env
-          echo "XGBOOST_PORT=8001" >> .env
-
-      - name: Build & Start Containers
-        run: |
-          docker compose down
-          docker compose up -d --build
-
-      - name: Cleanup
-        if: always()
-        run: rm -f .env
+networks:
+  agrovision-network:
+    driver: bridge

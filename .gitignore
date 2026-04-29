@@ -1,1 +1,25 @@
+# Environment variables
 .env
+
+# Docker
+postgres_data/
+
+# Backend
+BackEnd/AgroVision/target/
+*.class
+
+# Frontend
+FrontEnd/node_modules/
+FrontEnd/dist/
+
+# Python
+AI/cnn/.venv/
+AI/cnn/__pycache__/
+AI/xgboost/.venv/
+AI/xgboost/__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+*.swp

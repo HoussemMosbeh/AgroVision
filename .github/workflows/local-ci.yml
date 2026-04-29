@@ -5,27 +5,37 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: self-hosted
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USER }}"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
+    
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cat > .env << 'EOF'
+          POSTGRES_DB=AgroVision
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=123
+          BACKEND_PORT=8080
+          FRONTEND_PORT=5173
+          CNN_PORT=8000
+          XGBOOST_PORT=8001
+          EOF
+
+      - name: Start PostgreSQL
+        run: |
+          docker run -d \
+            --name postgres \
+            -e POSTGRES_DB=AgroVision \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=123 \
+            -p 5432:5432 \
+            postgres:15
+          sleep 10
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -35,9 +45,9 @@ jobs:
 
       - name: Build & Test Backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.POSTGRES_DB }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/AgroVision
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: 123
         run: |
           cd BackEnd/AgroVision
           mvn clean package -e
@@ -67,6 +77,12 @@ jobs:
           .venv/bin/pip install -r requirements.txt
           .venv/bin/python -m unittest discover
 
+      - name: Cleanup PostgreSQL
+        if: always()
+        run: |
+          docker stop postgres || true
+          docker rm postgres || true
+
   docker-compose-up:
     runs-on: self-hosted
     needs: build-and-test
@@ -76,13 +92,15 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
-          echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" >> .env
-          echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
-          echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
-          echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
+          cat > .env << 'EOF'
+          POSTGRES_DB=AgroVision
+          POSTGRES_USER=postgres
+          POSTGRES_PASSWORD=123
+          BACKEND_PORT=8080
+          FRONTEND_PORT=5173
+          CNN_PORT=8000
+          XGBOOST_PORT=8001
+          EOF
 
       - name: Build & Start Containers
         run: |
@@ -91,4 +109,6 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: rm -f .env
+        run: |
+          rm -f .env
+          docker compose down
