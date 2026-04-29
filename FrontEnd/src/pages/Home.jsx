@@ -70,43 +70,6 @@ function Home() {
 
   return (
     <div className="home">
-      {/* Barre de navigation principale */}
-      <header className={`home__navbar ${isScrolled ? 'home__navbar--scrolled' : ''}`}>
-        <div className="home__container home__navbar-inner">
-          <button type="button" className="home__logo" onClick={() => goTo('/app')}>
-            <span className="home__logo-icon" aria-hidden="true">🌱</span>
-            <span>AgroVision</span>
-          </button>
-
-          <nav className={`home__nav ${isMenuOpen ? 'home__nav--open' : ''}`}>
-            {NAV_LINKS.map((link) => (
-              <button
-                key={link.label}
-                type="button"
-                className="home__nav-link"
-                onClick={() => goTo(link.path)}
-              >
-                {link.label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="home__nav-actions">
-            <button type="button" className="home__btn home__btn--primary" onClick={() => goTo('/register')}>
-              Commencer
-            </button>
-            <button
-              type="button"
-              className="home__menu-toggle"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              aria-label="Ouvrir le menu"
-            >
-              {isMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          </div>
-        </div>
-      </header>
-
       {/* Section hero avec proposition de valeur */}
       <section className="home__hero">
         <div className="home__container home__hero-grid">
@@ -120,26 +83,8 @@ function Home() {
               AgroVision helps you manage your fields, track soil health, detect plant diseases,
               and predict yield with reliable AI models.
             </p>
-
-            <div className="home__hero-cta">
-              <button
-                type="button"
-                className="home__btn home__btn--primary"
-                onClick={() => goTo('/app/terrain')}
-              >
-                Gérer mes terrains
-              </button>
-              <button type="button" className="home__btn home__btn--outline">
-                Voir une démo
-              </button>
-            </div>
-
-            <div className="home__trust">
-              <span>✓ Gratuit</span>
-              <span>✓ Sans installation</span>
-              <span>✓ Résultats immédiats</span>
-            </div>
           </div>
+
 
           <div className="home__hero-visual">
             <div className="home__hero-circle" aria-hidden="true" />
