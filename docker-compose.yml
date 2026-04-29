@@ -1,75 +1,87 @@
-services:
-  postgres:
-    image: postgres:15
-    container_name: agrovision-postgres
-    environment:
-      POSTGRES_DB: agrovision
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - agrovision-network
+name: Local CI/CD
 
-  backend:
-    build: ./BackEnd/AgroVision
-    container_name: agrovision-backend
-    ports:
-      - "8080:8080"
-    depends_on:
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: self-hosted
+    env:
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+    services:
       postgres:
-        condition: service_healthy
-      cnn:
-        condition: service_started
-      xgboost-service:
-        condition: service_started
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/agrovision
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      cnn.service.url: http://cnn:8000
-      xgboost.service.url: http://xgboost-service:8001
-    networks:
-      - agrovision-network
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+      - name: Build & Test Backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
+          SPRING_DATASOURCE_USERNAME: ${{ env.POSTGRES_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          cd BackEnd/AgroVision
+          mvn clean package -e
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Build Frontend
+        run: |
+          cd FrontEnd
+          npm install
+          npm run build
+      - name: Test CNN
+        run: |
+          cd AI/cnn
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
+      - name: Test XGBoost
+        run: |
+          cd AI/xgboost
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
 
-  cnn:
-    build: ./AI/cnn
-    container_name: agrovision-cnn
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./AI/cnn/models:/app/models
-    networks:
-      - agrovision-network
-
-  xgboost-service:
-    build: ./AI/xgboost
-    container_name: agrovision-xgboost
-    ports:
-      - "8001:8001"
-    networks:
-      - agrovision-network
-
-  frontend:
-    build: ./FrontEnd
-    container_name: agrovision-frontend
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
-    networks:
-      - agrovision-network
-
-volumes:
-  pgdata:
-
-networks:
-  agrovision-network:
-    driver: bridge
+  docker-compose-up:
+    runs-on: self-hosted
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env file
+        run: |
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "BACKEND_PORT=${{ secrets.BACKEND_PORT }}" >> .env
+          echo "FRONTEND_PORT=${{ secrets.FRONTEND_PORT }}" >> .env
+          echo "CNN_PORT=${{ secrets.CNN_PORT }}" >> .env
+          echo "XGBOOST_PORT=${{ secrets.XGBOOST_PORT }}" >> .env
+      - name: Build & Start Containers
+        run: |
+          docker compose down
+          docker compose up -d --build
+      - name: Cleanup
+        if: always()
+        run: rm -f .env
