@@ -67,29 +67,24 @@ jobs:
       - name: Test CNN
         run: |
           cd AI/cnn
-          docker run --rm -v $(pwd):/app python:3.10-slim bash -c "
-            cd /app && \
-            python -m venv .venv && \
-            .venv/bin/pip install --upgrade pip && \
-            .venv/bin/pip install -r requirements.txt && \
-            .venv/bin/python -m unittest discover
-          "
+          python3.11 -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
 
       - name: Test XGBoost
         run: |
           cd AI/xgboost
-          docker run --rm -v $(pwd):/app python:3.10-slim bash -c "
-            cd /app && \
-            python -m venv .venv && \
-            .venv/bin/pip install --upgrade pip && \
-            .venv/bin/pip install -r requirements.txt && \
-            .venv/bin/python -m unittest discover
-          "
-      - name: Cleanup PostgreSQL
-        if: always()
-        run: |
-          docker stop postgres || true
-          docker rm postgres || true
+          python3.11 -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+          .venv/bin/python -m unittest discover
+                "
+            - name: Cleanup PostgreSQL
+              if: always()
+              run: |
+                docker stop postgres || true
+                docker rm postgres || true
 
   docker-compose-up:
     runs-on: self-hosted
