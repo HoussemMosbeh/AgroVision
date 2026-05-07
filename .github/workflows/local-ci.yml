@@ -71,20 +71,23 @@ jobs:
           .venv/bin/pip install --upgrade pip
           .venv/bin/pip install -r requirements.txt
           .venv/bin/python -m unittest discover
+          deactivate
 
       - name: Test XGBoost
         run: |
           cd AI/xgboost
           python3.11 -m venv .venv
-          .venv/bin/pip install --upgrade pip
-          .venv/bin/pip install -r requirements.txt
-          .venv/bin/python -m unittest discover
-                "
-            - name: Cleanup PostgreSQL
-              if: always()
-              run: |
-                docker stop postgres || true
-                docker rm postgres || true
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m unittest discover
+          deactivate
+
+      - name: Cleanup PostgreSQL
+        if: always()
+        run: |
+          docker stop postgres || true
+          docker rm postgres || true
 
   docker-compose-up:
     runs-on: self-hosted
