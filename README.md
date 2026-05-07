@@ -17,4 +17,3 @@ unvicorn src.predict:app --host 0.0.0.0 --port 8000
 cd ~/AgroVision/AI/xgboost
 uvicorn predict:app --host 0.0.0.0 --port 8001
 
-Hello
