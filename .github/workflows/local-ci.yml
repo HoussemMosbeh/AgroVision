@@ -71,7 +71,6 @@ jobs:
           .venv/bin/pip install --upgrade pip
           .venv/bin/pip install -r requirements.txt
           .venv/bin/python -m unittest discover
-          deactivate
 
       - name: Test XGBoost
         run: |
@@ -81,7 +80,6 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
           python -m unittest discover
-          deactivate
 
       - name: Cleanup PostgreSQL
         if: always()
